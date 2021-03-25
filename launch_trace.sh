@@ -60,10 +60,10 @@ fi
 #traceroute section
 if [ "$binary" == "traceroute" ] ; then
         if [ "$proto" == "tcp" ] ; then
-		cmd="traceroute -T -q $count `if ! [[ -z $src_port ]]; then echo \"--sport $src_port\"; fi` `if ! [[ -z $dst_port ]]; then echo \"--port $dst_port\"; fi` $target $psize";
+		cmd="traceroute -T -q $count `if ! [[ -z $src_port ]]; then echo \"--sport=$src_port\"; fi` `if ! [[ -z $dst_port ]]; then echo \"--port=$dst_port\"; fi` $target $psize";
         fi
         if [ "$proto" == "udp" ] ; then
-		cmd="traceroute -q $count `if ! [[ -z $src_port ]]; then echo \"--sport $src_port\"; fi` `if ! [[ -z $dst_port ]]; then echo \"--port $dst_port\"; fi` $target $psize";
+		cmd="traceroute -q $count `if ! [[ -z $src_port ]]; then echo \"--sport=$src_port\"; fi` `if ! [[ -z $dst_port ]]; then echo \"--port=$dst_port\"; fi` $target $psize";
         fi
         if [ "$proto" == "icmp" ] ; then
 		cmd="traceroute -I -q $count $target $psize";
