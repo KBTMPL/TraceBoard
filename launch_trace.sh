@@ -1,7 +1,9 @@
 #!/bin/bash
 
 #init
-source init.sh;
+tb="/home/kbulanda/kn2021/traceboard";
+jobs="$tb/jobs";
+prod="1";
 exec_date=`date +%s`;
 err_flag="0";
 
@@ -34,6 +36,53 @@ else
 	fi
 fi
 
-echo "$job_conf";
+#vars: binary end_stamp interval proto src_port dst_port psize count target tb jobs job_id job_dir job_conf name descr
 
+#remove job if it is outdated and stop from proceeding further
+if [ "$exec_date" -gt "$end_stamp" ] ; then
+	(crontab -l | sed "/$job_id/d") | crontab;
+	exit "100":
+fi
+
+#mtr section
+if [ "$binary" == "mtr" ] ; then
+	if [ "$proto" == "tcp" ] ; then
+		cmd="mtr --report-wide -rbzc $count --psize $psize --tcp `if ! [[ -z $src_port ]]; then echo \"-L $src_port\"; fi` `if ! [[ -z $dst_port ]]; then echo \"-P $dst_port\"; fi` $target";
+	fi
+	if [ "$proto" == "udp" ] ; then
+		cmd="mtr --report-wide -rbzc $count --psize $psize --udp `if ! [[ -z $src_port ]]; then echo \"-L $src_port\"; fi` `if ! [[ -z $dst_port ]]; then echo \"-P $dst_port\"; fi` $target";
+	fi
+	if [ "$proto" == "icmp" ] ; then
+		cmd="mtr --report-wide -rbzc $count --psize $psize $target";
+	fi
+fi
+
+#traceroute section
+if [ "$binary" == "traceroute" ] ; then
+        if [ "$proto" == "tcp" ] ; then
+		cmd="traceroute -T -q $count `if ! [[ -z $src_port ]]; then echo \"--sport $src_port\"; fi` `if ! [[ -z $dst_port ]]; then echo \"--port $dst_port\"; fi` $target $psize";
+        fi
+        if [ "$proto" == "udp" ] ; then
+		cmd="traceroute -q $count `if ! [[ -z $src_port ]]; then echo \"--sport $src_port\"; fi` `if ! [[ -z $dst_port ]]; then echo \"--port $dst_port\"; fi` $target $psize";
+        fi
+        if [ "$proto" == "icmp" ] ; then
+		cmd="traceroute -I -q $count $target $psize";
+        fi
+fi
+
+#hping3 section
+if [ "$binary" == "hping3" ] ; then
+        if [ "$proto" == "tcp" ] ; then
+                cmd="hping3 -c $count `if ! [[ -z $src_port ]]; then echo \"--baseport $src_port\"; fi` `if ! [[ -z $dst_port ]]; then echo \"--destport $dst_port\"; fi` -d $psize $target";
+        fi
+        if [ "$proto" == "udp" ] ; then
+                cmd="hping3 --udp -c $count `if ! [[ -z $src_port ]]; then echo \"--baseport $src_port\"; fi` `if ! [[ -z $dst_port ]]; then echo \"--destport $dst_port\"; fi` -d $psize $target";
+        fi
+        if [ "$proto" == "icmp" ] ; then
+                cmd="hping3 --icmp -c $count -d $psize $target";
+        fi
+fi
+
+#execute command
+sudo `echo $cmd` 2>&1 >> $job_dir/results;
 

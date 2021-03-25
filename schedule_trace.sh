@@ -1,7 +1,10 @@
 #!/bin/bash
 
+
 #init
-source init.sh;
+tb="/home/kbulanda/kn2021/traceboard";
+jobs="$tb/jobs";
+prod="1";
 exec_date=`date +%s`;
 err_flag="0";
 
