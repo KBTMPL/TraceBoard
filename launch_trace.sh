@@ -73,16 +73,19 @@ fi
 #hping3 section
 if [ "$binary" == "hping3" ] ; then
         if [ "$proto" == "tcp" ] ; then
-                cmd="hping3 -c $count `if ! [[ -z $src_port ]]; then echo \"--baseport $src_port\"; fi` `if ! [[ -z $dst_port ]]; then echo \"--destport $dst_port\"; fi` -d $psize $target";
+                cmd="hping3 -q -S -c $count `if ! [[ -z $src_port ]]; then echo \"--baseport $src_port\"; fi` `if ! [[ -z $dst_port ]]; then echo \"--destport $dst_port\"; fi` -d $psize $target";
         fi
         if [ "$proto" == "udp" ] ; then
-                cmd="hping3 --udp -c $count `if ! [[ -z $src_port ]]; then echo \"--baseport $src_port\"; fi` `if ! [[ -z $dst_port ]]; then echo \"--destport $dst_port\"; fi` -d $psize $target";
+                cmd="hping3 -q -S --udp -c $count `if ! [[ -z $src_port ]]; then echo \"--baseport $src_port\"; fi` `if ! [[ -z $dst_port ]]; then echo \"--destport $dst_port\"; fi` -d $psize $target";
         fi
         if [ "$proto" == "icmp" ] ; then
-                cmd="hping3 --icmp -c $count -d $psize $target";
+                cmd="hping3 -q --icmp -c $count -d $psize $target";
         fi
 fi
 
 #execute command
-sudo `echo $cmd` 2>&1 >> $job_dir/results;
+echo "ts:$exec_date" >> $job_dir/results
+sudo `echo $cmd` >> $job_dir/results 2>&1;
+#(sudo `echo $cmd`) 2>&1 >> $job_dir/results;
+#sudo `echo $cmd` | tee -a $job_dir/results;
 
