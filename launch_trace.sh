@@ -87,10 +87,25 @@ if [ "$binary" == "hping3" ] ; then
 fi
 
 #execute command
-echo "ts:$exec_date" >> $job_dir/results
 sudo `echo $cmd` > $job_dir/$exec_date 2>&1;
 
-
-#(sudo `echo $cmd`) 2>&1 >> $job_dir/results;
-#sudo `echo $cmd` | tee -a $job_dir/results;
-
+if [ "$binary" == "mtr" ] ; then
+	#Loss%   Snt   Last   Avg  Best  Wrst StDev
+	tail -n1 $job_dir/$exec_date | awk '{print $5";"$6";"$7";"$8";"$9";"$10";"$11}' >> $job_dir/tracesummary.csv;
+fi
+if [ "$binary" == "traceroute" ] ; then
+	#Loss%   Snt   Avg  Best  Wrst StDev
+	unreachable_count=`tail -n1 $job_dir/$exec_date | sed 's/ms//g' | awk '{for(i=4;i<=NF;i++){printf "%s ", $i}; printf "\n"}' | tr ' ' '\n' |grep -c '*'`;
+	total_count=`tail -n1 $job_dir/$exec_date | sed 's/ms//g' | awk '{for(i=4;i<=NF;i++){printf "%s ", $i}; printf "\n"}' | wc -w`;
+	packet_loss=`echo "scale=2;$unreachable_count/$total_count*100" | bc`;
+	if ! [ "$unreachable_count" -eq "$total_count" ] ; then
+		maths=`tail -n1 $job_dir/$exec_date | sed 's/ms//g' | awk '{for(i=4;i<=NF;i++){printf "%s ", $i}; printf "\n"}' | tr ' ' '\n' | head -n -1 | jq -s '{best:min,wrst:max,average:(add/length),stddev:((add/length)as $a|map(pow(.-$a;2))|add/(length-1)|sqrt) } | map(.) | @csv' | sed  "s/\"//g" | sed "s/,/;/g"`;
+	else
+		maths='0;0;0;0'
+	fi
+	echo "$packet_loss%;$total_count;$maths" >> $job_dir/tracesummary.csv;
+fi
+if [ "$binary" == "hping3" ] ; then
+	#Loss%   Snt   Avg  Best  Wrst
+	grep -E 'packet|round' $job_dir/$exec_date | xargs | sed 's/\// /g' | awk '{print $7";"$1";"$16";"$15";"$17}' >> $job_dir/tracesummary.csv;
+fi
