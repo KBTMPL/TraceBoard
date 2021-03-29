@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#TO DO!
+#rewrite $ based args to --arg
 
 #init
 tb="/home/kbulanda/kn2021/traceboard";
