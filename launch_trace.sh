@@ -99,7 +99,7 @@ if [ "$binary" == "traceroute" ] ; then
 	total_count=`tail -n1 $job_dir/$exec_date | sed 's/ms//g' | awk '{for(i=4;i<=NF;i++){printf "%s ", $i}; printf "\n"}' | wc -w`;
 	packet_loss=`echo "scale=2;$unreachable_count/$total_count*100" | bc`;
 	if ! [ "$unreachable_count" -eq "$total_count" ] ; then
-		maths=`tail -n1 $job_dir/$exec_date | sed 's/ms//g' | awk '{for(i=4;i<=NF;i++){printf "%s ", $i}; printf "\n"}' | tr ' ' '\n' | head -n -1 | jq -s '{best:min,wrst:max,average:(add/length),stddev:((add/length)as $a|map(pow(.-$a;2))|add/(length-1)|sqrt) } | map(.) | @csv' | sed  "s/\"//g" | sed "s/,/;/g"`;
+		maths=`tail -n1 $job_dir/$exec_date | sed 's/ms//g' | awk '{for(i=4;i<=NF;i++){printf "%s ", $i}; printf "\n"}' | xargs | tr ' ' '\n' | jq -s '{best:min,wrst:max,average:(add/length),stddev:((add/length)as $a|map(pow(.-$a;2))|add/(length-1)|sqrt) } | map(.) | @csv' | sed  "s/\"//g" | sed "s/,/;/g"`;
 	else
 		maths='0;0;0;0'
 	fi
