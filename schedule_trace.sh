@@ -1,8 +1,5 @@
 #!/bin/bash
 
-#TO DO!
-#rewrite $ based args to --arg
-
 #init
 tb="/home/kbulanda/kn2021/traceboard";
 jobs="$tb/jobs";
@@ -25,19 +22,59 @@ if [ "$prod" == "0" ] ; then
 	fi
 fi
 
-#params
-binary=$1;      #mtr hping3 traceroute
-end_stamp=$2;   #timestamp in epoch format for when job should end
-interval=$3;    #value in minutes 5, 10, 15, 30 or 60
-proto=$4;       #tcp udp icmp
-src_port=$5;    #source port (if applicable)
-dst_port=$6;    #destination port (if applicable)
-psize=$7;       #packet size in bytes
-count=$8;       #number of probes to be sent
-target=$9;      #destination for the trace job
-#optional params to be revised
-name=${10};	#name for the job
-descr=${11};	#description for the job
+#new params intake
+for i in "$@"
+do
+case $i in
+    -e=*|--binary=*)
+    binary="${i#*=}"
+    shift # past argument=value
+    ;;
+    -e=*|--end_stamp=*)
+    end_stamp="${i#*=}"
+    shift # past argument=value
+    ;;
+    -e=*|--interval=*)
+    interval="${i#*=}"
+    shift # past argument=value
+    ;;
+    -e=*|--proto=*)
+    proto="${i#*=}"
+    shift # past argument=value
+    ;;
+    -e=*|--src_port=*)
+    src_port="${i#*=}"
+    shift # past argument=value
+    ;;
+    -e=*|--dst_port=*)
+    dst_port="${i#*=}"
+    shift # past argument=value
+    ;;
+    -e=*|--psize=*)
+    psize="${i#*=}"
+    shift # past argument=value
+    ;;
+    -e=*|--count=*)
+    count="${i#*=}"
+    shift # past argument=value
+    ;;
+    -e=*|--target=*)
+    target="${i#*=}"
+    shift # past argument=value
+    ;;
+    -e=*|--name=*)
+    name="${i#*=}"
+    shift # past argument=value
+    ;;
+    -e=*|--descr=*)
+    descr="${i#*=}"
+    shift # past argument=value
+    ;;
+    *)
+          # unknown option
+    ;;
+esac
+done
 
 #basic param security filter
 #re='^[0-9]+$';
@@ -157,7 +194,7 @@ fi
 
 #create trace config file
 if [ "$prod" == "1" ] ; then
-        typeset -p binary end_stamp interval proto src_port dst_port psize count target tb jobs job_id job_dir job_conf name descr > $job_conf
+        typeset -p binary end_stamp interval proto src_port dst_port psize count target tb jobs job_id job_dir job_conf name descr > $job_conf  2>&1;
 else
 	echo -e "${BLUE}serializing params like below${NC}";
 	typeset -p binary end_stamp interval proto src_port dst_port psize count target tb jobs job_id job_dir job_conf name descr
