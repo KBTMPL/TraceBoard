@@ -16,4 +16,6 @@ Dependencies:
 
 Example usage:
 
+```
 ./schedule_trace.sh --binary='mtr' --end_stamp=`echo $(date "+%s") + 900|bc` --interval=5  --proto=tcp  --dst_port=443  --psize=1460 --count=30 --target=www.disney.com
+```
