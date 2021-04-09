@@ -91,7 +91,8 @@ sudo `echo $cmd` > $job_dir/$exec_date 2>&1;
 
 if [ "$binary" == "mtr" ] ; then
 	#Loss%   Snt   Last   Avg  Best  Wrst StDev
-	tail -n1 $job_dir/$exec_date | awk '{print $5";"$6";"$7";"$8";"$9";"$10";"$11}' >> $job_dir/tracesummary.csv;
+	prepped_line=`tail -n1 $job_dir/$exec_date | awk '{print $5";"$6";"$7";"$8";"$9";"$10";"$11}'`
+	echo "$exec_date;$prepped_line" >> $job_dir/tracesummary.csv;
 fi
 if [ "$binary" == "traceroute" ] ; then
 	#Loss%   Snt   Avg  Best  Wrst StDev
@@ -103,9 +104,10 @@ if [ "$binary" == "traceroute" ] ; then
 	else
 		maths='0;0;0;0'
 	fi
-	echo "$packet_loss%;$total_count;$maths" >> $job_dir/tracesummary.csv;
+	echo "$exec_date;$packet_loss%;$total_count;$maths" >> $job_dir/tracesummary.csv;
 fi
 if [ "$binary" == "hping3" ] ; then
 	#Loss%   Snt   Avg  Best  Wrst
-	grep -E 'packet|round' $job_dir/$exec_date | xargs | sed 's/\// /g' | awk '{print $7";"$1";"$16";"$15";"$17}' >> $job_dir/tracesummary.csv;
+	prepped_line=`grep -E 'packet|round' $job_dir/$exec_date | xargs | sed 's/\// /g' | awk '{print $7";"$1";"$16";"$15";"$17}'`
+	echo "$exec_date;$prepped_line" >> $job_dir/tracesummary.csv;
 fi
