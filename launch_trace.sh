@@ -39,12 +39,20 @@ else
 	fi
 fi
 
+if [ "$job_id" == ".healthcheck" ] ; then
+	healthcheck="1";
+else
+	healthcheck="0";
+fi
+
 #vars: binary end_stamp interval proto src_port dst_port psize count target tb jobs job_id job_dir job_conf name descr
 
-#remove job if it is outdated and stop from proceeding further
-if [ "$exec_date" -gt "$end_stamp" ] ; then
-	(crontab -l | sed "/$job_id/d") | crontab;
-	exit "100":
+#remove job if it is outdated and stop from proceeding further - only if it is not healthcheck
+if [ "$healthcheck" == "0" ] ; then
+	if [ "$exec_date" -gt "$end_stamp" ] ; then
+		(crontab -l | sed "/$job_id/d") | crontab;
+		exit "100":
+	fi
 fi
 
 #mtr section

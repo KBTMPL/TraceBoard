@@ -22,6 +22,8 @@ if [ "$prod" == "0" ] ; then
 	fi
 fi
 
+healthcheck="0";
+
 #new params intake
 for i in "$@"
 do
@@ -70,6 +72,10 @@ case $i in
     descr="${i#*=}"
     shift # past argument=value
     ;;
+    -e=*|--healthcheck)
+    healthcheck="1";
+    shift # past argument=value
+    ;;
     *)
           # unknown option
     ;;
@@ -92,14 +98,16 @@ if [ "$interval" != "5" ] && [ "$interval" != "10" ] && [ "$interval" != "15" ] 
 	err_flag=`echo $err_flag + 8 | bc`;
 fi
 
-#end_stamp check
-if ! [[ $end_stamp =~ $re ]] ; then
-	err_flag=`echo $err_flag + 4 | bc`;
-else
-	ts_diff=`echo "$end_stamp - $exec_date" | bc`;
-	ts_threshold=`echo "$interval * 60 * 2" | bc`;
-	if [ "$ts_diff" -le "$ts_threshold" ] ; then
-        	err_flag=`echo $err_flag + 4 | bc`;
+if [ "$healthcheck" == "0" ] ; then
+	#end_stamp check
+	if ! [[ $end_stamp =~ $re ]] ; then
+		err_flag=`echo $err_flag + 4 | bc`;
+	else
+		ts_diff=`echo "$end_stamp - $exec_date" | bc`;
+		ts_threshold=`echo "$interval * 60 * 2" | bc`;
+		if [ "$ts_diff" -le "$ts_threshold" ] ; then
+			err_flag=`echo $err_flag + 4 | bc`;
+		fi
 	fi
 fi
 
@@ -159,13 +167,17 @@ if [ "$err_flag" -ne "0" ] ; then
 fi
 
 #creating actual job_id
-job_id="`cat /dev/urandom | tr -dc "a-zA-Z0-9" | fold -w 32 | head -n 1`";
+if [ "$healthcheck" == "0" ] ; then
+	job_id="`cat /dev/urandom | tr -dc "a-zA-Z0-9" | fold -w 32 | head -n 1`";
+else
+	job_id=".healthcheck";
+fi
 job_dir="$jobs/$job_id";
 job_conf="$job_dir/.traceconf.sh";
 
 #job dir creation
 if [ "$prod" == "1" ] ; then
-	mkdir $job_dir;
+	mkdir -p $job_dir;
 else
 	echo -e "${BLUE}creating following directory:${NC}";
 	echo -e "$job_dir \n";
@@ -187,6 +199,12 @@ fi
 #add crontab entry
 
 if [ "$prod" == "1" ] ; then
+	if [ "$healthcheck" == "1" ] ; then
+		check_for_existing_healthcheck=`crontab -l | grep 'healthcheck' -c`;
+		if [ "$check_for_existing_healthcheck" == "1" ] ; then
+			(crontab -l | sed "/.healthcheck/d") | crontab;
+		fi
+	fi
 	(crontab -l ; echo "$crontab_entry") | crontab;
 else
 	 echo -e "${BLUE}and updated actual crontab\n${NC}";
