@@ -212,7 +212,7 @@ fi
 
 #create trace config file
 if [ "$prod" == "1" ] ; then
-        typeset -p binary end_stamp interval proto src_port dst_port psize count target tb jobs job_id job_dir job_conf name descr > $job_conf  2>&1;
+        typeset -p binary end_stamp interval proto src_port dst_port psize count target tb jobs job_id job_dir job_conf name descr > $job_conf  2> /dev/null;
 else
 	echo -e "${BLUE}serializing params like below${NC}";
 	typeset -p binary end_stamp interval proto src_port dst_port psize count target tb jobs job_id job_dir job_conf name descr
