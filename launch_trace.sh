@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #TO DO!
-#rewrite output to be split into ts based and one summary file with timestamp;loss;latency (last hop)
+#
 
 #init
 tb="/home/kbulanda/kn2021/traceboard";
@@ -90,8 +90,8 @@ fi
 sudo `echo $cmd` > $job_dir/$exec_date 2>&1;
 
 if [ "$binary" == "mtr" ] ; then
-	#Loss%   Snt   Last   Avg  Best  Wrst StDev
-	prepped_line=`tail -n1 $job_dir/$exec_date | awk '{print $5";"$6";"$7";"$8";"$9";"$10";"$11}'`
+	#Loss%   Snt   Avg  Best  Wrst StDev  Last
+	prepped_line=`tail -n1 $job_dir/$exec_date | awk '{print $5";"$6";"$8";"$9";"$10";"$11";"$7}'`
 	echo "$exec_date;$prepped_line" >> $job_dir/tracesummary.csv;
 fi
 if [ "$binary" == "traceroute" ] ; then
