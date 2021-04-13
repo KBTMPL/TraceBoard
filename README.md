@@ -3,7 +3,7 @@
 Simple dashboard for setting up and viewing traces
 
 - Bash for backend
-- Most likely lightweight python web framework for frontend
+- CherryPy python3 web framework for frontend
 
 Dependencies:
 
@@ -13,6 +13,7 @@ Dependencies:
 - proper rights for raw sockets
 - jq
 - other bash cmds
+- python3 (cherrypy, os, csv, datetime modules)
 
 Example usage:
 
