@@ -45,7 +45,7 @@ class TraceBoard(object):
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                             <li class="nav-item">
-                                <a class="nav-link active" aria-current="page" href="#">Home</a>
+                                <a class="nav-link active" aria-current="page" href="/">Home</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="/?job_id=aaa">Schedule trace</a>
@@ -62,10 +62,15 @@ class TraceBoard(object):
                     <option selected value="" disabled selected hidden>Choose job from list</option>
                     """ + trace_jobs.list_jobs_dropdown(job_id) + """
                 </select>
-            
-            <div id="container" class="mt-3" style="width:100%; height:400px;"></div>
-            
+                
+                <div id="container" class="container-fluid bg-light">
+                    <div class="row">
+                        <div class="col-xxl-4 my-3 d-flex align-items-start">""" + trace_jobs.show_job_details_info(job_id) + """</div>
+                        <div class="col-xxl-8 my-3 d-flex align-items-center"><div id="chart_container" style="width:100%; height:600px"></div></div>
+                    </div>
+                </div>
             </div>
+            
             
             <script>
             """ + trace_jobs.show_chart(job_id) + """
@@ -77,8 +82,6 @@ class TraceBoard(object):
                 
                 window.location = job_path;              
             }
-            
-            """ + "" + """
             </script>
         </body>
         </html>
@@ -94,10 +97,11 @@ if __name__ == '__main__':
         '/': {
             'tools.sessions.on': True,
             'tools.staticdir.root': os.path.abspath(os.getcwd())
-        },
-        '/static': {
-            'tools.staticdir.on': True,
-            'tools.staticdir.dir': './dirs'
         }
+        # ,
+        # '/static': {
+        #     'tools.staticdir.on': True,
+        #     'tools.staticdir.dir': './dirs'
+        # }
     }
     cherrypy.quickstart(TraceBoard(), '/', conf)
