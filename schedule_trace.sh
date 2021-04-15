@@ -211,6 +211,56 @@ else
 fi
 
 #create trace config file
+
+if [ -z "$binary" ] ; then
+	binary="N/A";
+fi
+if [ -z "$end_stamp" ] ; then
+	end_stamp="N/A";
+fi
+if [ -z "$interval" ] ; then
+	interval="N/A";
+fi
+if [ -z "$proto" ] ; then
+	proto="N/A";
+fi
+if [ -z "$src_port" ] ; then
+	src_port="N/A";
+fi
+if [ -z "$dst_port" ] ; then
+        dst_port="N/A";
+fi
+if [ -z "$psize" ] ; then
+        psize="N/A";
+fi
+if [ -z "$count" ] ; then
+        count="N/A";
+fi
+if [ -z "$target" ] ; then
+        target="N/A";
+fi
+if [ -z "$tb" ] ; then
+        tb="N/A";
+fi
+if [ -z "$jobs" ] ; then
+        jobs="N/A";
+fi
+if [ -z "$job_id" ] ; then
+        job_id="N/A";
+fi
+if [ -z "$job_dir" ] ; then
+        job_dir="N/A";
+fi
+if [ -z "$job_conf" ] ; then
+        job_conf="N/A";
+fi
+if [ -z "$name" ] ; then
+        name="N/A";
+fi
+if [ -z "$descr" ] ; then
+        descr="N/A";
+fi
+
 if [ "$prod" == "1" ] ; then
         typeset -p binary end_stamp interval proto src_port dst_port psize count target tb jobs job_id job_dir job_conf name descr > $job_conf  2> /dev/null;
 else
