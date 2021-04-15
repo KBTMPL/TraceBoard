@@ -31,6 +31,12 @@ else
 	job_conf="$jobs/$job_id/.traceconf.sh";
 	if [ -f "$job_conf" ] ; then
 		source "$job_conf";
+		for var in binary end_stamp interval proto src_port dst_port psize count target tb jobs job_id job_dir job_conf name descr;
+		do
+			if [ "${!var}" == "N/A" ] ; then
+				unset `echo "$var"`;
+			fi
+		done
 	else
 		if [ "$prod" == "0" ] ; then
                 	echo -e "${RED}$job_conf does not exist\n${NC}";
