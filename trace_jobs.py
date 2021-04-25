@@ -76,6 +76,10 @@ def show_job_details_info(selected_job_id):
     printable_job_details = ""
     if selected_job_id is not None and selected_job_id in os.listdir(jobs_path):
         job_details = get_job_conf_info(selected_job_id)
+        try:
+            endstamp_date = datetime.fromtimestamp(int(job_details["end_stamp"])).strftime("%m/%d/%Y %H:%M:%S")
+        except ValueError:
+            endstamp_date = job_details["end_stamp"]
         printable_job_details = """
                 <div class="chart_container">
                     <table class="table">
@@ -101,11 +105,11 @@ def show_job_details_info(selected_job_id):
                                 <td>""" + job_details["target"] + """</td>
                             </tr>
                             <tr>
-                                <th scope="row">End timestamp</th>
-                                <td>""" + job_details["end_stamp"] + """</td>
+                                <th scope="row">End date</th>
+                                <td>""" + endstamp_date + """</td>
                             </tr>
                             <tr>
-                                <th scope="row">Interval</th>
+                                <th scope="row">Interval [min]</th>
                                 <td>""" + job_details["interval"] + """</td>
                             </tr>
                             <tr>
@@ -121,7 +125,7 @@ def show_job_details_info(selected_job_id):
                                 <td>""" + job_details["dst_port"] + """</td>
                             </tr>
                             <tr>
-                                <th scope="row">Packet size</th>
+                                <th scope="row">Packet size [B]</th>
                                 <td>""" + job_details["psize"] + """</td>
                             </tr>
                             <tr>
@@ -141,15 +145,16 @@ def show_chart(selected_job_id):
     loss_list = list()
     latency_list = list()
     if selected_job_id is not None and selected_job_id in os.listdir(jobs_path):
-        print(get_job_conf_info(selected_job_id))
         selected_job_summary_path = os.path.join(jobs_path, selected_job_id, "tracesummary.csv")
         with open(selected_job_summary_path) as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=';')
             rows = list(csv_reader)
             if len(rows) > 0:
+                if len(rows) > 15:
+                    rows = rows[-15:]
                 for row in rows:
                     date_time = datetime.fromtimestamp(int(row[0]))
-                    timestamp_list.append(date_time.strftime("%m/%d/%Y %H:%M:%S"))
+                    timestamp_list.append(date_time.strftime("%d/%m/%Y %H:%M:%S"))
                     loss_list.append(str(row[1]).replace("%", ""))
                     latency_list.append(str(row[2]))
 
@@ -184,6 +189,18 @@ def show_chart(selected_job_id):
                                 },
                                 opposite: true
                             }],
+                            plotOptions: {
+                                series: {
+                                    cursor: 'pointer',
+                                    point: {
+                                        events: {
+                                            click: function () {
+                                                show_trace_details(this.category);
+                                            }
+                                        }
+                                    }
+                                }
+                            },
                             series: [{
                                 name: 'Loss',
                                 data: [""" + ",".join(loss_list) + """]
@@ -198,3 +215,4 @@ def show_chart(selected_job_id):
     else:
         printable_show_chart = """document.getElementById('container').style.display = 'none';"""
     return printable_show_chart
+
