@@ -53,6 +53,25 @@ class TraceBoard(object):
                     </div>
                 </div>
             </nav>
+            <div class="mx-3">
+                <h1 class="my-4">Welcome to Trace Board!</h1>
+                <div class="my-4">
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+                    Ut imperdiet velit sed turpis hendrerit, ac bibendum ligula vehicula. 
+                    Suspendisse eu leo fermentum eros maximus bibendum. 
+                    Vestibulum pharetra odio sit amet diam tempus lacinia. 
+                    Curabitur lorem nisi, ultrices vel auctor non, pellentesque vitae lectus.
+                    Vestibulum ac blandit purus. 
+                    Vivamus sagittis accumsan lacus, ac rutrum urna efficitur quis. 
+                    Vivamus a purus condimentum erat blandit rhoncus nec eu sapien. 
+                    Etiam ligula risus, sagittis vel est vel, posuere imperdiet diam. 
+                    Nullam leo metus, aliquam non semper sit amet, hendrerit eget mauris. 
+                    Sed a ante vitae quam consequat posuere. Phasellus at justo orci. 
+                    Vestibulum ultricies varius placerat. Praesent hendrerit consectetur odio nec faucibus.</p>
+                </div>
+                <h2 class="mt-5">Health check status</h2>
+                """ + trace_jobs.get_health_check_status() + """
+            </div>
         </body>
         </html>
         """
@@ -150,9 +169,9 @@ class TraceBoard(object):
                        var trace_date_split = trace_date.split(" ");
                        var date = trace_date_split[0].split("/");
                        var time = trace_date_split[1].split(":");
-                       var datum = new Date( date[2], date[1] - 1, date[0], time[0], time[1], time[2])/1000;
+                       var timestamp = new Date( date[2], date[1] - 1, date[0], time[0], time[1], time[2])/1000;
 
-                       var trace_path = '""" + job_id + "/" + """' + datum;
+                       var trace_path = '""" + job_id + "/" + """' + timestamp;
                        document.getElementById('trace_date').innerHTML='Trace from: ' + trace_date;
                        document.getElementById('show_trace').style.display = 'block';
                        $("#trace_details_container").load("/static/" + trace_path);
