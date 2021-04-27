@@ -13,6 +13,7 @@ Dependencies:
 - proper rights for raw sockets
 - jq
 - other bash cmds
+- pango-view
 - python3 (cherrypy, os, csv, datetime, re modules)
 
 Example usage:
