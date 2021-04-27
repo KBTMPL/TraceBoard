@@ -3,7 +3,7 @@ import csv
 from datetime import datetime
 import re
 
-jobs_path = ""
+jobs_path = "./jobs"
 
 
 def get_job_name(job_id):

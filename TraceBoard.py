@@ -29,7 +29,12 @@ class TraceBoard(object):
             
             <!-- Highcharts -->
             <script src="https://code.highcharts.com/highcharts.src.js"></script>     
-
+            <style>
+                .trace {
+                    width:90%;
+                    height:auto;
+                }
+            </style>
         </head>
         <body>
             <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -101,7 +106,12 @@ class TraceBoard(object):
 
                    <!-- Highcharts -->
                    <script src="https://code.highcharts.com/highcharts.src.js"></script>     
-
+                   <style>
+                   .trace {
+                       width:90%;
+                       height:auto;
+                   }
+                   </style>
                </head>
                <body>
                    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -144,7 +154,7 @@ class TraceBoard(object):
                                <div class="col-xxl-12 me-2 mb-3">
                                    <div class="card" id="show_trace" style="background-color:#fefefe">
                                        <p class="card-title mt-2 mx-3" id="trace_date"></p>
-                                       <div class="card-body" id="trace_details_container" style="white-space:pre-line;"></div>
+                                       <a id="trace_details_link"><div class="card-body" id="trace_details_container" style="white-space:pre-line;"><img id="trace" class="trace" /></div></a>
                                    </div>
                                </div>
                            </div>
@@ -162,19 +172,24 @@ class TraceBoard(object):
                        var selected_job_id = selected_job.value;
                        var job_path = '/trace_jobs?job_id=' + selected_job_id;
 
-                       window.location = job_path;              
+                       window.location = job_path;
                    }
 
                    function show_trace_details(trace_date) {
+                       var selected_job = document.getElementById("select_job");
+                       var selected_job_id = selected_job.value;
                        var trace_date_split = trace_date.split(" ");
                        var date = trace_date_split[0].split("/");
                        var time = trace_date_split[1].split(":");
                        var timestamp = new Date( date[2], date[1] - 1, date[0], time[0], time[1], time[2])/1000;
+                       var trace_path = selected_job_id + "/" + timestamp.toString();
 
-                       var trace_path = '""" + job_id + "/" + """' + timestamp;
                        document.getElementById('trace_date').innerHTML='Trace from: ' + trace_date;
                        document.getElementById('show_trace').style.display = 'block';
-                       $("#trace_details_container").load("/static/" + trace_path);
+
+                       $("#trace").attr("src", "/static/" + trace_path + ".svg")
+                       $("#trace_details_link").attr("href", "/static/" + trace_path);
+                       $("#trace_details_link").attr("download", "/static/" + trace_path + ".txt");
 
                        window.location.hash = "show_trace";
                    }
@@ -241,7 +256,7 @@ class TraceBoard(object):
 if __name__ == '__main__':
     conf = {
         'global': {
-            'server.socket_host': '127.0.0.1',
+            'server.socket_host': '0.0.0.0',
             'server.socket_port': 8080
         },
         '/': {
@@ -250,7 +265,7 @@ if __name__ == '__main__':
         },
         '/static': {
             'tools.staticdir.on': True,
-            'tools.staticdir.dir': ''
+            'tools.staticdir.dir': './jobs'
         }
     }
     cherrypy.quickstart(TraceBoard(), '/', conf)
