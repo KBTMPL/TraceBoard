@@ -31,7 +31,7 @@ class TraceBoard(object):
             <script src="https://code.highcharts.com/highcharts.src.js"></script>     
             <style>
                 .trace {
-                    width:90%;
+                    width:100%;
                     height:auto;
                 }
             </style>
@@ -78,6 +78,9 @@ class TraceBoard(object):
                 """ + trace_jobs.get_health_check_status() + """
             </div>
         </body>
+        <script>
+            """ + trace_jobs.get_health_check_last_trace_js() + """
+        </script>
         </html>
         """
 
@@ -154,7 +157,7 @@ class TraceBoard(object):
                                <div class="col-xxl-12 me-2 mb-3">
                                    <div class="card" id="show_trace" style="background-color:#fefefe">
                                        <p class="card-title mt-2 mx-3" id="trace_date"></p>
-                                       <a id="trace_details_link"><div class="card-body" id="trace_details_container" style="white-space:pre-line;"><img id="trace" class="trace" /></div></a>
+                                       <a id="trace_details_link"><img id="trace" class="trace"/></a>
                                    </div>
                                </div>
                            </div>
@@ -223,8 +226,7 @@ class TraceBoard(object):
                 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.min.js" integrity="sha384-j0CNLUeiqtyaRmlzUHCPZ+Gy5fQu0dQ6eZ/xAww941Ai1SxSY+0EQqNXNE6DZiVc" crossorigin="anonymous"></script>
 
                 <!-- Highcharts -->
-                <script src="https://code.highcharts.com/highcharts.src.js"></script>     
-
+                <script src="https://code.highcharts.com/highcharts.src.js"></script>
             </head>
             <body>
                 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -248,7 +250,123 @@ class TraceBoard(object):
                         </div>
                     </div>
                 </nav>
+                <div class="mx-3">
+                    <h1 class="my-4">Schedule new trace</h1>
+                    <form method="post" action="schedule_trace">
+                        <div class="mb-3">
+                            <label for="inputName" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="name" placeholder="Name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="inputDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="descr" rows="3" placeholder="Description"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="inputTarget" class="form-label">Target</label>
+                            <input type="text" class="form-control" id="target" placeholder="Target" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="inputBinary" class="form-label">Binary</label>
+                                <select name="binary" class="form-select" id="binary" form="binaryform">
+                                    <option selected value="" disabled selected hidden>Choose binary</option>
+                                    <option value="mtr">mtr</option>
+                                    <option value="traceroute">traceroute</option>
+                                    <option value="hping3">hpin3</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="inputProtocol" class="form-label">Protocol</label>
+                                <select name="proto" class="form-select" id="proto" form="protoform" onchange="proto_change()">
+                                    <option selected value="" disabled selected hidden>Choose protocol</option>
+                                    <option value="tcp">TCP</option>
+                                    <option value="udp">UDP</option>
+                                    <option value="icmp">ICMP</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="inputSrcPort" class="form-label">Source port</label>
+                                <input type="number" class="form-control" id="src_port">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="inputDstPort" class="form-label">Destination port</label>
+                                <input type="number" class="form-control" id="dst_port">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="inputDate" class="form-label">End date</label>
+                                <input type="date" class="form-control" id="end_date" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="inputTime" class="form-label">End time</label>
+                                <input type="time" class="form-control" id="end_time" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="inputInterval" class="form-label">Interval</label>
+                                <select name="interval" class="form-select" id="interval" form="intervalform">
+                                    <option selected value="" disabled selected hidden>Choose interval</option>
+                                    <option value="5">5 min</option>
+                                    <option value="10">10 min</option>
+                                    <option value="15">15 min</option>
+                                    <option value="30">30 min</option>
+                                    <option value="60">60 min</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="inputCount" class="form-label">Count</label>
+                                <input type="number" class="form-control" id="count">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="inputPsize" class="form-label">Packet size</label>
+                                <input type="number" class="form-control" id="psize">
+                            </div>
+                        </div>
+                        <div class="mb-3 mt-2 form-check">
+                            <input type="checkbox" class="form-check-input" id="healthcheck" onclick="healthcheck_change()">
+                            <label class="form-check-label" for="healthCheck">Health check</label>
+                        </div>
+                        <div class="text-center my-4">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </form>
+                </div>
             </body>
+             <script>
+                 function proto_change() {
+                     var selected_proto = document.getElementById("proto").value;
+                     if (selected_proto == "icmp") {
+                          $("#src_port").attr("disabled", "true");
+                          $("#dst_port").attr("disabled", "true");
+                          $("#src_port").val("");
+                          $("#dst_port").val("");
+                     }
+		     else {
+                          $("#src_port").removeAttr("disabled");
+                          $("#dst_port").removeAttr("disabled");
+                     }
+                 }
+                 function healthcheck_change() {
+                     if (document.getElementById("healthcheck").checked) {
+                          $("#end_date").removeAttr("required");
+                          $("#end_time").removeAttr("required");
+                          $("#end_date").attr("disabled", "true");
+                          $("#end_time").attr("disabled", "true");
+                          $("#end_date").val("");
+                          $("#end_time").val("");
+                     }
+                     else {
+                          $("#end_date").removeAttr("disabled");
+                          $("#end_time").removeAttr("disabled");
+                          $("#end_date").attr("required", "true");
+                          $("#end_time").attr("required", "true");
+                     }
+                 }
+            </script>
             </html>
             """
 

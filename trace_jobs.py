@@ -3,7 +3,7 @@ import csv
 from datetime import datetime
 import re
 
-jobs_path = "./jobs"
+jobs_path = './jobs'
 
 
 def get_job_name(job_id):
@@ -159,7 +159,7 @@ def show_chart(selected_job_id):
                         date_time = datetime.fromtimestamp(int(row[0]))
                         timestamp_list.append(date_time.strftime("%d/%m/%Y %H:%M:%S"))
                         loss_list.append(str(row[1]).replace("%", ""))
-                        latency_list.append(str(row[2]))
+                        latency_list.append(str(row[3]))
 
             printable_show_chart = """
                         document.addEventListener('DOMContentLoaded', function () {
@@ -236,7 +236,7 @@ def get_health_check_status():
                         date_time = datetime.fromtimestamp(int(last_trace[0]))
                         timestamp_date = date_time.strftime("%d/%m/%Y %H:%M:%S")
                         loss = str(last_trace[1]).replace("%", "")
-                        latency = str(last_trace[2])
+                        latency = str(last_trace[3])
 
                         health_last_trace_path = os.path.join(health_job_path, str(last_trace[0]))
                         if os.path.exists(health_last_trace_path):
@@ -248,27 +248,27 @@ def get_health_check_status():
                         printable_last_trace_info = """
                                 <div id="container" class="container-fluid mb-4">
                                     <div class="row">
-                                        <div class="col-4 my-3">
+                                        <div class="col-md-4 my-3">
                                             <div class="alert alert-primary container-fluid" role="alert">
                                                 <h5>Timestamp date</h5>
                                                 <p>""" + timestamp_date + """</p>
                                             </div>
                                         </div>
-                                        <div class="col-4 my-3">
+                                        <div class="col-md-4 my-3">
                                             <div class="alert alert-primary container-fluid" role="alert">
                                                 <h5>Loss</h5>
                                                 <p>""" + loss + """%</p>
                                             </div>
                                         </div>
-                                        <div class="col-4 my-3">
+                                        <div class="col-md-4 my-3">
                                             <div class="alert alert-primary container-fluid" role="alert">
                                                 <h5>Average latency</h5>
                                                 <p>""" + latency + """ ms</p>
                                             </div>
                                         </div>
                                         <div class="row">
-                                            <div id="last_health_check_trace" class="overflow-scroll container-fluid" style="white-space:pre-line; height:300px">
-                                                """ + content + """
+                                            <div id="last_health_check_trace" class="container-fluid" style="height:300px">
+                                                <a id="trace_details_link"><img id="trace" class="trace"/></a>                                           
                                             </div>
                                         </div>
                                     </div>
@@ -282,8 +282,8 @@ def get_health_check_status():
         printable_health_check = """
                  <div id="container" class="container-fluid mb-4">
                  <div class="row">
-                    <div class="col-xxl-4 my-3">""" + show_job_details_info(".healthcheck") + """</div>
-                    <div class="col-xxl-8 my-3">
+                    <div class="col-xl-4 my-3">""" + show_job_details_info(".healthcheck") + """</div>
+                    <div class="col-xl-8 my-3">
                         <div class="container-fluid mb-3">
                             <h3 class="mb-3">Last trace status</h3>
                             """ + printable_last_trace_info + """
@@ -299,3 +299,30 @@ def get_health_check_status():
                 </div>
                 """
     return printable_health_check
+
+
+def get_health_check_last_trace_js():
+    printable_content = ""
+    health_job_path = os.path.join(jobs_path, ".healthcheck")
+    health_summary_path = os.path.join(jobs_path, ".healthcheck", "tracesummary.csv")
+    if os.path.exists(health_summary_path):
+        with open(health_summary_path) as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter=';')
+            rows = list(csv_reader)
+            if len(rows) > 0:
+                last_trace = rows[-1]
+                health_last_trace_path = os.path.join(health_job_path, str(last_trace[0]))
+                if os.path.exists(health_last_trace_path):
+                    trace_path = '.healthcheck/' + str(last_trace[0])
+                    print(trace_path)
+                    printable_content = """
+                            $("#trace").attr("src", "/static/" + '""" + trace_path + """' + ".svg")
+                            $("#trace_details_link").attr("href", "/static/" + '""" + trace_path + """');
+                            $("#trace_details_link").attr("download", "/static/" + '""" + trace_path + """' + ".txt");
+                            """
+                else:
+                    printable_content = """
+                                document.getElementById('last_health_check_trace').innerHTML='No trace file available.';
+                                """
+    print(printable_content)
+    return printable_content
