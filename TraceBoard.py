@@ -104,7 +104,7 @@ class TraceBoard(object):
                    <script src="https://code.highcharts.com/highcharts.src.js"></script>     
                    <style>
                    .trace {
-                       width:90%;
+                       width:80%;
                        height:auto;
                    }
                    </style>
@@ -385,7 +385,7 @@ class TraceBoard(object):
                                         <option """ + binary_selected_dict["title"] + """ value="" disabled selected hidden>Choose binary</option>
                                         <option """ + binary_selected_dict["mtr"] + """ value="mtr">mtr</option>
                                         <option """ + binary_selected_dict["traceroute"] + """ value="traceroute">traceroute</option>
-                                        <option """ + binary_selected_dict["hping3"] + """ value="hping3">hpin3</option>
+                                        <option """ + binary_selected_dict["hping3"] + """ value="hping3">hping3</option>
                                     </select>
                                 </div>
                                 <div class="col-md-6 mb-3">
