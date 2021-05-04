@@ -76,6 +76,9 @@ fi
 
 #traceroute section
 if [ "$binary" == "traceroute" ] ; then
+	if [ "$count" -ge "10" ] ; then
+	count=10;
+	fi
         if [ "$proto" == "tcp" ] ; then
 		cmd="traceroute -T -q $count `if ! [[ -z $src_port ]]; then echo \"--sport=$src_port\"; fi` `if ! [[ -z $dst_port ]]; then echo \"--port=$dst_port\"; fi` $target $psize";
         fi
