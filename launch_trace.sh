@@ -4,7 +4,7 @@
 #
 
 #init
-tb="/home/kbulanda/kn2021/traceboard";
+tb="/home/kbulanda/kn2021/TraceBoard";
 jobs="$tb/jobs";
 prod="1";
 exec_date=`date +%s`;
@@ -108,7 +108,13 @@ sudo `echo $cmd` > $job_dir/$exec_date 2>&1 && pango-view --font=mono -qo $job_d
 
 if [ "$binary" == "mtr" ] ; then
 	#Loss%   Snt   Avg  Best  Wrst StDev  Last
-	prepped_line=`tail -n1 $job_dir/$exec_date | awk '{print $5";"$6";"$8";"$9";"$10";"$11";"$7}'`
+	last_line="`tail -n1 $job_dir/$exec_date`;
+	unpin=`echo $last_line | grep -c '???'`
+	if [ "$unpin" -eq "0"] ; then
+		prepped_line=`echo $last_line | awk '{print $5";"$6";"$8";"$9";"$10";"$11";"$7}'`
+	else
+		prepped_line=`echo $last_line | awk '{print $4";"$5";"$7";"$8";"$9";"$10";"$6}'`
+	fi
 	echo "$exec_date;$prepped_line" >> $job_dir/tracesummary.csv;
 fi
 if [ "$binary" == "traceroute" ] ; then
