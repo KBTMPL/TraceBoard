@@ -108,12 +108,12 @@ sudo `echo $cmd` > $job_dir/$exec_date 2>&1 && pango-view --font=mono -qo $job_d
 
 if [ "$binary" == "mtr" ] ; then
 	#Loss%   Snt   Avg  Best  Wrst StDev  Last
-	last_line="`tail -n1 $job_dir/$exec_date`;
-	unpin=`echo $last_line | grep -c '???'`
-	if [ "$unpin" -eq "0"] ; then
-		prepped_line=`echo $last_line | awk '{print $5";"$6";"$8";"$9";"$10";"$11";"$7}'`
+	last_line="`tail -n1 $job_dir/$exec_date`";
+	unpin="`echo $last_line | grep -c '???'`";
+	if [ "$unpin" -eq "0" ] ; then
+		prepped_line=`echo $last_line | awk '{print $5";"$6";"$8";"$9";"$10";"$11";"$7}'`;
 	else
-		prepped_line=`echo $last_line | awk '{print $4";"$5";"$7";"$8";"$9";"$10";"$6}'`
+		prepped_line=`echo $last_line | awk '{print $4";"$5";"$7";"$8";"$9";"$10";"$6}'`;
 	fi
 	echo "$exec_date;$prepped_line" >> $job_dir/tracesummary.csv;
 fi
@@ -125,7 +125,7 @@ if [ "$binary" == "traceroute" ] ; then
 	if ! [ "$unreachable_count" -eq "$total_count" ] ; then
 		maths=`tail -n1 $job_dir/$exec_date | sed 's/ms//g' | awk '{for(i=4;i<=NF;i++){printf "%s ", $i}; printf "\n"}' | xargs | tr ' ' '\n' | jq -s '{best:min,wrst:max,average:(add/length),stddev:((add/length)as $a|map(pow(.-$a;2))|add/(length-1)|sqrt) } | map(.) | @csv' | sed  "s/\"//g" | sed "s/,/;/g"`;
 	else
-		maths='0;0;0;0'
+		maths='0;0;0;0';
 	fi
 	echo "$exec_date;$packet_loss%;$total_count;$maths" >> $job_dir/tracesummary.csv;
 fi
