@@ -14,7 +14,7 @@ Dependencies:
 - jq
 - other bash cmds
 - pango-view
-- python3 (cherrypy, os, csv, datetime, re modules)
+- python3 (cherrypy, os, csv, datetime, time, re, subprocess modules)
 
 Example usage:
 
