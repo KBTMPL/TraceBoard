@@ -104,7 +104,8 @@ if [ "$binary" == "hping3" ] ; then
 fi
 
 #execute command
-sudo `echo $cmd` > $job_dir/$exec_date 2>&1 && pango-view --font=mono -qo $job_dir/$exec_date.svg $job_dir/$exec_date
+sudo `echo $cmd` > $job_dir/$exec_date 2>&1;
+pango-view --font=mono -qo $job_dir/$exec_date.svg $job_dir/$exec_date;
 
 if [ "$binary" == "mtr" ] ; then
 	#Loss%   Snt   Avg  Best  Wrst StDev  Last
