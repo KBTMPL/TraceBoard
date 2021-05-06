@@ -88,7 +88,7 @@ def show_job_details_info(selected_job_id):
         if selected_job_id is not None and selected_job_id in os.listdir(jobs_path):
             job_details = get_job_conf_info(selected_job_id)
             try:
-                endstamp_date = datetime.fromtimestamp(int(job_details["end_stamp"])).strftime("%m/%d/%Y %H:%M:%S")
+                endstamp_date = datetime.fromtimestamp(int(job_details["end_stamp"])).strftime("%d/%m/%Y %H:%M:%S")
             except ValueError:
                 endstamp_date = job_details["end_stamp"]
             printable_job_details = """
